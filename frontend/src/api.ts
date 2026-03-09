@@ -1,4 +1,4 @@
-import type { AnalysisResult } from './types'
+import type { AnalysisResult, Provider } from './types'
 
 // In production set VITE_API_URL to your backend URL (e.g. https://my-api.railway.app).
 // In local dev the Vite proxy handles /api → localhost:8000, so this is empty.
@@ -6,12 +6,13 @@ const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 export async function analyzeResume(
   resumeText: string,
-  jobDescription: string
+  jobDescription: string,
+  provider: Provider = 'claude'
 ): Promise<AnalysisResult> {
   const res = await fetch(`${API_BASE}/api/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ resume_text: resumeText, job_description: jobDescription }),
+    body: JSON.stringify({ resume_text: resumeText, job_description: jobDescription, provider }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Unknown error' }))

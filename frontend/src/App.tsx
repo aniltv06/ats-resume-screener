@@ -1,16 +1,25 @@
 import { useState } from 'react'
 import ResumeInput from './components/ResumeInput'
 import JobDescInput from './components/JobDescInput'
+import ProviderSelector from './components/ProviderSelector'
 import ScoreCard from './components/ScoreCard'
 import KeywordAnalysis from './components/KeywordAnalysis'
 import Suggestions from './components/Suggestions'
 import { analyzeResume } from './api'
-import type { AnalysisResult } from './types'
+import type { AnalysisResult, Provider } from './types'
+
+const PROVIDER_LABELS: Record<Provider, string> = {
+  claude: 'Claude Sonnet 4.6',
+  openai: 'GPT-4o',
+  gemini: 'Gemini 1.5 Pro',
+}
 
 export default function App() {
   const [resumeText, setResumeText] = useState('')
   const [jobDescription, setJobDescription] = useState('')
+  const [provider, setProvider] = useState<Provider>('claude')
   const [result, setResult] = useState<AnalysisResult | null>(null)
+  const [usedProvider, setUsedProvider] = useState<Provider | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -23,8 +32,9 @@ export default function App() {
     setError('')
     setResult(null)
     try {
-      const data = await analyzeResume(resumeText, jobDescription)
+      const data = await analyzeResume(resumeText, jobDescription, provider)
       setResult(data)
+      setUsedProvider(provider)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.')
     } finally {
@@ -45,7 +55,7 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-gray-900">Resume Screener</h1>
-            <p className="text-xs text-gray-500">ATS scoring powered by Claude AI</p>
+            <p className="text-xs text-gray-500">ATS scoring powered by AI</p>
           </div>
         </div>
       </header>
@@ -55,6 +65,11 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <ResumeInput value={resumeText} onChange={setResumeText} />
           <JobDescInput value={jobDescription} onChange={setJobDescription} />
+        </div>
+
+        {/* Provider selector */}
+        <div className="mb-6">
+          <ProviderSelector value={provider} onChange={setProvider} />
         </div>
 
         {error && (
@@ -87,6 +102,11 @@ export default function App() {
         {/* Results section */}
         {result && (
           <div className="flex flex-col gap-6">
+            {usedProvider && (
+              <p className="text-xs text-gray-400 text-center">
+                Analyzed by {PROVIDER_LABELS[usedProvider]}
+              </p>
+            )}
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               <ScoreCard score={result.ats_score} />
               <div className="flex-1">
