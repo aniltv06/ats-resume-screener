@@ -12,6 +12,7 @@ const PROVIDER_LABELS: Record<Provider, string> = {
   claude: 'Claude Sonnet 4.6',
   openai: 'GPT-4o',
   gemini: 'Gemini 1.5 Pro',
+  local: 'Keyword Match (no AI)',
 }
 
 export default function App() {

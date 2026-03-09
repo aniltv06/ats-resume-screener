@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Literal
 
-from services import claude_service, openai_service, gemini_service
+from services import claude_service, openai_service, gemini_service, local_service
 
 router = APIRouter()
 
@@ -10,13 +10,14 @@ PROVIDERS = {
     "claude": claude_service.analyze_resume,
     "openai": openai_service.analyze_resume,
     "gemini": gemini_service.analyze_resume,
+    "local": local_service.analyze_resume,
 }
 
 
 class AnalyzeRequest(BaseModel):
     resume_text: str
     job_description: str
-    provider: Literal["claude", "openai", "gemini"] = "claude"
+    provider: Literal["claude", "openai", "gemini", "local"] = "claude"
 
 
 @router.post("/analyze")

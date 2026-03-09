@@ -1,4 +1,4 @@
-export type Provider = 'claude' | 'openai' | 'gemini'
+export type Provider = 'claude' | 'openai' | 'gemini' | 'local'
 
 export interface AnalysisResult {
   ats_score: number
